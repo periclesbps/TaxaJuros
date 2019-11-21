@@ -4,6 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Serialization;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace TaxaJuros.Controllers
 {
@@ -12,9 +16,9 @@ namespace TaxaJuros.Controllers
     public class TaxaJurosController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<double> TaxaJuros()
+        public ActionResult<string> TaxaJuros()
         {
-            return 0.01;
+            return JsonConvert.SerializeObject("1%");
         }
     }
 }
