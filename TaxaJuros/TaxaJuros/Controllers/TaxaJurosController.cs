@@ -10,7 +10,14 @@ namespace TaxaJuros.Controllers
         [HttpGet]
         public ActionResult<string> TaxaJuros()
         {
-            return JsonConvert.SerializeObject("1%");
+            var result = new Taxa { Value = 0.01M };
+
+            return JsonConvert.SerializeObject(result);
         }
+    }
+
+    public class Taxa
+    {
+        public decimal Value { get; set; }
     }
 }

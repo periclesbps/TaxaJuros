@@ -8,13 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CalculaJuros.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("calculaJuros")]
     public class CalculaController : Controller
     {
         // GET: api/<controller>
         [HttpGet]
         public IEnumerable<string> Get()
         {
+            var teste = new TaxaJurosRepositorio();
+
+            var taxa = teste.GetTaxa();
+
+            taxa.ContinueWith(task =>
+            {
+                var t = task.Result;
+
+                return new string[] { "value1", t.ToString() };
+            });
+
             return new string[] { "value1", "value2" };
         }
 
