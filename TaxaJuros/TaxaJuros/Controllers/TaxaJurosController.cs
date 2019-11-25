@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TaxaJuros.Controllers
 {
@@ -8,16 +9,12 @@ namespace TaxaJuros.Controllers
     public class TaxaJurosController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> TaxaJuros()
+        public string TaxaJuros()
         {
-            var result = new Taxa { Value = 0.01M };
-
-            return JsonConvert.SerializeObject(result);
+            return JsonConvert.SerializeObject(0.01M, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
-    }
-
-    public class Taxa
-    {
-        public decimal Value { get; set; }
     }
 }

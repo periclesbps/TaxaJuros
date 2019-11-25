@@ -1,8 +1,6 @@
 ﻿using CalculaJuros.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -11,24 +9,53 @@ namespace CalculaJuros
 {
     public class TaxaJurosRepositorio
     {
-        HttpClient client = new HttpClient();
+        private HttpClient _client;
+        private HttpClient Client
+        {
+            get
+            {
+                if (this._client == null)
+                {
+                    this._client = new HttpClient();
+                    this._client.BaseAddress = new Uri("http://localhost:51677/");
+                    this._client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                }
 
+                return this._client;
+            }
+        }
         public TaxaJurosRepositorio()
         {
-            client.BaseAddress = new Uri("http://localhost:51677/");
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public TaxaJurosRepositorio(HttpClient c)
+        {
+            _client = c;
         }
 
         public async Task<Taxa> GetTaxa()
         {
             var taxa = new Taxa();
 
-            HttpResponseMessage response = await client.GetAsync("taxajuros");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var data = await response.Content.ReadAsStringAsync();
-                taxa = JsonConvert.DeserializeObject<Taxa>(data);
+                HttpResponseMessage response = await this.Client.GetAsync("taxajuros");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = await response.Content.ReadAsStringAsync();
+
+                    taxa.Valor = JsonConvert.DeserializeObject<decimal>(data, new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                    taxa.Sucesso = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                taxa.Mensagem = ex.Message;
             }
 
             return taxa;

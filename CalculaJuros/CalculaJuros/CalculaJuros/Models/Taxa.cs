@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CalculaJuros.Models
+﻿namespace CalculaJuros.Models
 {
-    public class Taxa
+    public class Taxa : RetornoBase
     {
-        public decimal Value { get; set; }
+        public decimal Valor { get; set; }
     }
 }
