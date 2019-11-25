@@ -17,7 +17,7 @@ namespace CalculaJuros
                 if (this._client == null)
                 {
                     this._client = new HttpClient();
-                    this._client.BaseAddress = new Uri("http://localhost:51677/");
+                    this._client.BaseAddress = new Uri("http://localhost:63585/");
                     this._client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 }
 
@@ -51,6 +51,10 @@ namespace CalculaJuros
                     });
 
                     taxa.Sucesso = true;
+                }
+                else
+                {
+                    taxa.Mensagem = response.RequestMessage.ToString();
                 }
             }
             catch (Exception ex)

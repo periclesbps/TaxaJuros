@@ -9,17 +9,17 @@ namespace CalculaJuros.Negocio
 {
     public class RgrCalcularJuros : RetornoBase
     {
-        private TaxaJurosRepositorio _ws;
-        private TaxaJurosRepositorio WS
+        private TaxaJurosRepositorio _repositorio;
+        private TaxaJurosRepositorio Repositorio
         {
             get
             {
-                if (this._ws == null)
+                if (this._repositorio == null)
                 {
-                    this._ws = new TaxaJurosRepositorio();
+                    this._repositorio = new TaxaJurosRepositorio();
                 }
 
-                return this._ws;
+                return this._repositorio;
             }
         }
 
@@ -30,10 +30,10 @@ namespace CalculaJuros.Negocio
 
         public RgrCalcularJuros(TaxaJurosRepositorio ws)
         {
-            this._ws = ws;
+            this._repositorio = ws;
         }
 
-        public CalculoJuros Calcular(decimal valorInicial, int tempo)
+        public async Task<CalculoJuros> Calcular(decimal valorInicial, int tempo)
         {
             var retorno = new CalculoJuros();
 
@@ -44,7 +44,14 @@ namespace CalculaJuros.Negocio
                 if (!string.IsNullOrEmpty(retorno.Mensagem))
                     return retorno;
 
-                var taxa = this.ObterTaxaJuros();
+                var taxa = await this.ObterTaxaJuros();
+
+                //taxaTask.ContinueWith(task =>
+                //{
+                //    retorno = task.Result;
+                //},
+                //TaskContinuationOptions.OnlyOnRanToCompletion);
+
 
                 if (!taxa.Sucesso)
                 {
@@ -55,6 +62,7 @@ namespace CalculaJuros.Negocio
                 retorno.Juros = Convert.ToDouble(taxa.Valor);
                 retorno.ValorInicial = valorInicial;
                 retorno.Tempo = tempo;
+                retorno.Sucesso = true;
             }
             catch (Exception ex)
             {
@@ -87,19 +95,20 @@ namespace CalculaJuros.Negocio
             return retorno;
         }
 
-        private Taxa ObterTaxaJuros()
+        private async Task<Taxa> ObterTaxaJuros()
         {
-            var retorno = new Taxa();
+            //var retorno = new Taxa();
 
-            var task = this.WS.GetTaxa();
 
-            task.ContinueWith(task =>
-            {
-                retorno = task.Result;
-            },
-            TaskContinuationOptions.OnlyOnRanToCompletion);
+            return await this.Repositorio.GetTaxa();
 
-            return retorno;
+            //taxaTask.ContinueWith(task =>
+            //{
+            //    retorno = task.Result;
+            //},
+            //TaskContinuationOptions.OnlyOnRanToCompletion);
+
+            //return retorno;
         }
     }
 }

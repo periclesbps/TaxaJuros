@@ -11,7 +11,7 @@ namespace TaxaJuros.Controllers
         [HttpGet]
         public string TaxaJuros()
         {
-            return JsonConvert.SerializeObject(0.01M, new JsonSerializerSettings
+            return JsonConvert.SerializeObject(0.01, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             });
