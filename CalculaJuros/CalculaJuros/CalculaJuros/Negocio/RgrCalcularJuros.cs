@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CalculaJuros.Negocio
 {
-    public class RgrCalcularJuros : RetornoBase
+    public class RgrCalcularJuros
     {
         private TaxaJurosRepositorio _repositorio;
         private TaxaJurosRepositorio Repositorio
@@ -33,36 +33,28 @@ namespace CalculaJuros.Negocio
             this._repositorio = ws;
         }
 
-        public async Task<CalculoJuros> Calcular(decimal valorInicial, int tempo)
+        public virtual async Task<JurosCompostos> Calcular(decimal valorInicial, int tempo)
         {
-            var retorno = new CalculoJuros();
+            var retorno = new JurosCompostos();
 
             try
             {
                 retorno.Mensagem = this.ValidaDadosEntrada(valorInicial, tempo);
 
                 if (!string.IsNullOrEmpty(retorno.Mensagem))
-                    return retorno;
-
-                var taxa = await this.ObterTaxaJuros();
-
-                //taxaTask.ContinueWith(task =>
-                //{
-                //    retorno = task.Result;
-                //},
-                //TaskContinuationOptions.OnlyOnRanToCompletion);
-
-
-                if (!taxa.Sucesso)
                 {
-                    retorno.Mensagem = taxa.Mensagem;
                     return retorno;
                 }
 
-                retorno.Juros = Convert.ToDouble(taxa.Valor);
-                retorno.ValorInicial = valorInicial;
-                retorno.Tempo = tempo;
-                retorno.Sucesso = true;
+                var taxaJuros = await this.Repositorio.GetTaxa();
+
+                if (!taxaJuros.Sucesso)
+                {
+                    retorno.Mensagem = taxaJuros.Mensagem;
+                    return retorno;
+                }
+
+                retorno = this.DefinirValoresParaCalculo(valorInicial, tempo, taxaJuros.Valor);
             }
             catch (Exception ex)
             {
@@ -70,6 +62,17 @@ namespace CalculaJuros.Negocio
             }
 
             return retorno;
+        }
+
+        private JurosCompostos DefinirValoresParaCalculo(decimal valorInicial, int tempo, decimal juros)
+        {
+            return new JurosCompostos
+            {
+                Juros = Convert.ToDouble(juros),
+                ValorInicial = valorInicial,
+                Tempo = tempo,
+                Sucesso = true
+            };
         }
 
         private string ValidaDadosEntrada(decimal valorInicial, int tempo)
@@ -84,7 +87,7 @@ namespace CalculaJuros.Negocio
 
             if (tempo < 1)
             {
-                erros.Add("Tempo");
+                erros.Add("Meses");
             }
 
             if (erros.Any())
@@ -93,22 +96,6 @@ namespace CalculaJuros.Negocio
             }
 
             return retorno;
-        }
-
-        private async Task<Taxa> ObterTaxaJuros()
-        {
-            //var retorno = new Taxa();
-
-
-            return await this.Repositorio.GetTaxa();
-
-            //taxaTask.ContinueWith(task =>
-            //{
-            //    retorno = task.Result;
-            //},
-            //TaskContinuationOptions.OnlyOnRanToCompletion);
-
-            //return retorno;
         }
     }
 }

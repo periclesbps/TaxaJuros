@@ -10,22 +10,43 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CalculaJuros.Controllers
 {
-    [Route("calculaJuros/")]
+    [Route("calculajuros/")]
     public class CalculaController : Controller
     {
+        private RgrCalcularJuros _regra;
+        private RgrCalcularJuros Regra
+        {
+            get
+            {
+                if (this._regra == null)
+                {
+                    this._regra = new RgrCalcularJuros();
+                }
+                return this._regra;
+            }
+        }
+
+        public CalculaController()
+        {
+
+        }
+
+        public CalculaController(RgrCalcularJuros rgr)
+        {
+            this._regra = rgr;
+        }
+
         // GET: api/<controller>
         [HttpGet]
         public async Task<string> Get([FromQuery(Name = "valorinicial")] decimal valorInicial, [FromQuery(Name = "meses")] int meses)
         {
             var retorno = "";
 
-            var regra = new RgrCalcularJuros();
-
-            var calculo = await regra.Calcular(valorInicial, meses);
+            var calculo = await this.Regra.Calcular(valorInicial, meses);
 
             if (calculo.Sucesso)
             {
-                retorno = calculo.ValorFinal.ToString();
+                retorno = calculo.ValorFinal;
             }
             else
             {
@@ -33,45 +54,6 @@ namespace CalculaJuros.Controllers
             }
 
             return retorno;
-        }
-
-        //[HttpGet("{id}")]
-        //public string Get([FromQuery(Name = "valorinicial")] decimal valorInicial, [FromQuery(Name = "meses")] int meses)
-        //{
-        //    var retorno = string.Empty;
-
-        //    var regra = new RgrCalcularJuros();
-
-        //    var calculoRealizado = regra.Calcular(valorInicial, meses);
-
-        //    if (calculoRealizado.Sucesso)
-        //    {
-        //        retorno = calculoRealizado.ValorFinal.ToString();
-        //    }
-        //    else
-        //    {
-        //        retorno = calculoRealizado.Mensagem;
-        //    }
-
-        //    return retorno;
-        //}
-
-        // POST api/<controller>
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/<controller>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

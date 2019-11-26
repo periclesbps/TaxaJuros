@@ -17,13 +17,14 @@ namespace CalculaJuros
                 if (this._client == null)
                 {
                     this._client = new HttpClient();
-                    this._client.BaseAddress = new Uri("http://localhost:63585/");
+                    this._client.BaseAddress = new Uri("http://localhost:51677/");
                     this._client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 }
 
                 return this._client;
             }
         }
+
         public TaxaJurosRepositorio()
         {
         }
@@ -33,29 +34,13 @@ namespace CalculaJuros
             _client = c;
         }
 
-        public async Task<Taxa> GetTaxa()
+        public virtual async Task<Taxa> GetTaxa()
         {
             var taxa = new Taxa();
 
             try
             {
-                HttpResponseMessage response = await this.Client.GetAsync("taxajuros");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var data = await response.Content.ReadAsStringAsync();
-
-                    taxa.Valor = JsonConvert.DeserializeObject<decimal>(data, new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-
-                    taxa.Sucesso = true;
-                }
-                else
-                {
-                    taxa.Mensagem = response.RequestMessage.ToString();
-                }
+                await this.BuscarDados(taxa);
             }
             catch (Exception ex)
             {
@@ -63,6 +48,32 @@ namespace CalculaJuros
             }
 
             return taxa;
+        }
+
+        private async Task BuscarDados(Taxa taxa)
+        {
+            HttpResponseMessage response = await this.Client.GetAsync("taxajuros");
+
+            if (response.IsSuccessStatusCode)
+            {
+                await this.Desserializar(taxa, response);
+
+                taxa.Sucesso = true;
+            }
+            else
+            {
+                taxa.Mensagem = response.RequestMessage.ToString();
+            }
+        }
+
+        private async Task Desserializar(Taxa taxa, HttpResponseMessage response)
+        {
+            var data = await response.Content.ReadAsStringAsync();
+
+            taxa.Valor = JsonConvert.DeserializeObject<decimal>(data, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
     }
 }
