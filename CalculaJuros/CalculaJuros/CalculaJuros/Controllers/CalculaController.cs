@@ -13,36 +13,38 @@ namespace CalculaJuros.Controllers
     [Route("calculajuros/")]
     public class CalculaController : Controller
     {
-        private RgrCalcularJuros _regra;
-        private RgrCalcularJuros Regra
-        {
-            get
-            {
-                if (this._regra == null)
-                {
-                    this._regra = new RgrCalcularJuros();
-                }
-                return this._regra;
-            }
-        }
+        //private RgrCalcularJuros _regra;
+        //private RgrCalcularJuros Regra
+        //{
+        //    get
+        //    {
+        //        if (this._regra == null)
+        //        {
+        //            this._regra = new RgrCalcularJuros();
+        //        }
+        //        return this._regra;
+        //    }
+        //}
 
-        public CalculaController()
-        {
+        //public CalculaController()
+        //{
 
-        }
+        //}
 
-        public CalculaController(RgrCalcularJuros rgr)
-        {
-            this._regra = rgr;
-        }
+        //public CalculaController(RgrCalcularJuros rgr)
+        //{
+        //    this._regra = rgr;
+        //}
 
         // GET: api/<controller>
         [HttpGet]
         public async Task<string> Get([FromQuery(Name = "valorinicial")] decimal valorInicial, [FromQuery(Name = "meses")] int meses)
         {
+            var regra = new RgrCalcularJuros();
+
             var retorno = "";
 
-            var calculo = await this.Regra.Calcular(valorInicial, meses);
+            var calculo = await regra.Calcular(valorInicial, meses);
 
             if (calculo.Sucesso)
             {
